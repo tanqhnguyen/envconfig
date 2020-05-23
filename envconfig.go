@@ -8,6 +8,7 @@ import (
 	"encoding"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"reflect"
 	"regexp"
@@ -180,6 +181,32 @@ func CheckDisallowed(prefix string, spec interface{}) error {
 	return nil
 }
 
+func getContentFromFile(info varInfo) (string, bool) {
+	fromFile, ok := info.Tags.Lookup("file_content")
+	if !ok {
+		return "", false
+	}
+	// default to `file` suffix
+	if isTrue(fromFile) {
+		fromFile = "file"
+	}
+	fromFileKey := fmt.Sprintf("%s_%s", info.Key, strings.ToUpper(fromFile))
+	filePath, ok := lookupEnv(fromFileKey)
+	if !ok || filePath == "" {
+		return "", false
+	}
+	fileContent, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return "", false
+	}
+	fileContentStr := string(fileContent)
+	if fileContentStr == "" {
+		return "", false
+	}
+
+	return fileContentStr, true
+}
+
 // Process populates the specified struct based on environment variables
 func Process(prefix string, spec interface{}) error {
 	infos, err := gatherInfo(prefix, spec)
@@ -210,6 +237,10 @@ func Process(prefix string, spec interface{}) error {
 				return fmt.Errorf("required key %s missing value", key)
 			}
 			continue
+		}
+
+		if contentFromFile, ok := getContentFromFile(info); ok {
+			value = contentFromFile
 		}
 
 		err = processField(value, info.Field)

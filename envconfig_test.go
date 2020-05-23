@@ -794,7 +794,7 @@ func TestCheckDisallowedIgnored(t *testing.T) {
 
 func TestErrorMessageForRequiredAltVar(t *testing.T) {
 	var s struct {
-		Foo    string `envconfig:"BAR" required:"true"`
+		Foo string `envconfig:"BAR" required:"true"`
 	}
 
 	os.Clearenv()
@@ -806,6 +806,45 @@ func TestErrorMessageForRequiredAltVar(t *testing.T) {
 
 	if !strings.Contains(err.Error(), " BAR ") {
 		t.Errorf("expected error message to contain BAR, got \"%v\"", err)
+	}
+}
+
+func TestLoadingConfigValueFromFile(t *testing.T) {
+	var s struct {
+		Secret string `file_content:"true" required:"true"`
+	}
+
+	os.Clearenv()
+	os.Setenv("ENV_CONFIG_SECRET", "something")
+
+	err := Process("env_config", &s)
+	if err != nil {
+		t.Errorf("expected no error, got %s", err)
+	}
+
+	if want := "something"; s.Secret != want {
+		t.Errorf("foo: got %#q, want %#q", s.Secret, want)
+	}
+
+	// not found, fallback to `ENV_CONFIG_SECRET`
+	os.Setenv("ENV_CONFIG_SECRET_FILE", "something")
+	err = Process("env_config", &s)
+	if err != nil {
+		t.Errorf("expected no error, got %s", err)
+	}
+	if want := "something"; s.Secret != want {
+		t.Errorf("foo: got %#q, want %#q", s.Secret, want)
+	}
+
+	// or overwrite it when the file exists
+	path, _ := os.Getwd()
+	os.Setenv("ENV_CONFIG_SECRET_FILE", fmt.Sprintf("%s/testdata/secret", path))
+	err = Process("env_config", &s)
+	if err != nil {
+		t.Errorf("expected no error, got %s", err)
+	}
+	if want := "secret"; s.Secret != want {
+		t.Errorf("foo: got %#q, want %#q", s.Secret, want)
 	}
 }
 
