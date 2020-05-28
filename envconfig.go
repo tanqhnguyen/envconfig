@@ -206,7 +206,7 @@ func getContentFromFile(info varInfo) (string, bool) {
 		return "", false
 	}
 
-	return fileContentStr, true
+	return strings.TrimSpace(fileContentStr), true
 }
 
 // Process populates the specified struct based on environment variables
