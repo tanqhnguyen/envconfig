@@ -15,8 +15,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/prometheus/common/log"
 )
 
 // ErrInvalidSpecification indicates that a specification is of the wrong type.
@@ -199,12 +197,12 @@ func getContentFromFile(info varInfo) (string, bool) {
 	}
 	fileContent, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		log.Error("failed to load secret from file, err: ", err)
+		fmt.Println("failed to load secret from file, err: ", err)
 		return "", false
 	}
 	fileContentStr := string(fileContent)
 	if fileContentStr == "" {
-		log.Warn("empty secret from file")
+		fmt.Println("empty secret from file")
 		return "", false
 	}
 
