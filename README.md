@@ -1,14 +1,14 @@
 # envconfig
 
-[![Build Status](https://travis-ci.org/kelseyhightower/envconfig.svg)](https://travis-ci.org/kelseyhightower/envconfig)
+An extension of (http://godoc.org/github.com/kelseyhightower/envconfig)[http://godoc.org/github.com/kelseyhightower/envconfig]
 
 ```Go
-import "github.com/kelseyhightower/envconfig"
+import "github.com/tanqhnguyen/envconfig"
 ```
 
 ## Documentation
 
-See [godoc](http://godoc.org/github.com/kelseyhightower/envconfig)
+See [godoc](http://godoc.org/github.com/tanqhnguyen/envconfig)
 
 ## Usage
 
@@ -91,7 +91,7 @@ Color codes:
 
 ## Struct Tag Support
 
-Envconfig supports the use of struct tags to specify alternate, default, and required
+Envconfig supports the use of struct tags to specify alternate, default, content from file and required
 environment variables.
 
 For example, consider the following struct:
@@ -104,6 +104,7 @@ type Specification struct {
     IgnoredVar      string `ignored:"true"`
     AutoSplitVar    string `split_words:"true"`
     RequiredAndAutoSplitVar    string `required:"true" split_words:"true"`
+    Secret          string `file_content:"true"`
 }
 ```
 
@@ -129,7 +130,7 @@ If envconfig can't find an environment variable value for `MYAPP_DEFAULTVAR`,
 it will populate it with "foobar" as a default value.
 
 If envconfig can't find an environment variable value for `MYAPP_REQUIREDVAR`,
-it will return an error when asked to process the struct.  If
+it will return an error when asked to process the struct. If
 `MYAPP_REQUIREDVAR` is present but empty, envconfig will not return an error.
 
 If envconfig can't find an environment variable in the form `PREFIX_MYVAR`, and there
@@ -140,6 +141,7 @@ variable that directly matches the envconfig tag in your struct definition:
 export SERVICE_HOST=127.0.0.1
 export MYAPP_DEBUG=true
 ```
+
 ```Go
 type Specification struct {
     ServiceHost string `envconfig:"SERVICE_HOST"`
@@ -150,19 +152,21 @@ type Specification struct {
 Envconfig won't process a field with the "ignored" tag set to "true", even if a corresponding
 environment variable is set.
 
+The tag `file_content` can be used to read from a file, this is useful when we need to use (docker secret)[https://docs.docker.com/engine/swarm/secrets/]. By default, it appends `_FILE` to the env variable name to look for the file path. For example, with this struct, envconfig will look for `MYAPP_SECRET_FILE`, change `file_content` to something if needed (for instance, `file_content:"__FILE"`, this will look for `MYAPP_SECRET__FILE`). Content read from a file will have higher priority than value stored in `MYAPP_SECRET`. If the file is not found / unreadable for whatever reason, it will fail gracefully and fallback to `MYAPP_SECRET`.
+
 ## Supported Struct Field Types
 
 envconfig supports these struct field types:
 
-  * string
-  * int8, int16, int32, int64
-  * bool
-  * float32, float64
-  * slices of any supported type
-  * maps (keys and values of any supported type)
-  * [encoding.TextUnmarshaler](https://golang.org/pkg/encoding/#TextUnmarshaler)
-  * [encoding.BinaryUnmarshaler](https://golang.org/pkg/encoding/#BinaryUnmarshaler)
-  * [time.Duration](https://golang.org/pkg/time/#Duration)
+- string
+- int8, int16, int32, int64
+- bool
+- float32, float64
+- slices of any supported type
+- maps (keys and values of any supported type)
+- [encoding.TextUnmarshaler](https://golang.org/pkg/encoding/#TextUnmarshaler)
+- [encoding.BinaryUnmarshaler](https://golang.org/pkg/encoding/#BinaryUnmarshaler)
+- [time.Duration](https://golang.org/pkg/time/#Duration)
 
 Embedded structs using these fields are also supported.
 
