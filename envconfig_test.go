@@ -846,6 +846,17 @@ func TestLoadingConfigValueFromFile(t *testing.T) {
 	if want := "secret"; s.Secret != want {
 		t.Errorf("foo: got %#q, want %#q", s.Secret, want)
 	}
+
+	// should not fail if the file exists but not the key
+	os.Clearenv()
+	os.Setenv("ENV_CONFIG_SECRET_FILE", fmt.Sprintf("%s/testdata/secret", path))
+	err = Process("env_config", &s)
+	if err != nil {
+		t.Errorf("expected no error, got %s", err)
+	}
+	if want := "secret"; s.Secret != want {
+		t.Errorf("foo: got %#q, want %#q", s.Secret, want)
+	}
 }
 
 type bracketed string

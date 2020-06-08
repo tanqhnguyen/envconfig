@@ -229,8 +229,12 @@ func Process(prefix string, spec interface{}) error {
 			value = def
 		}
 
+		if contentFromFile, ok := getContentFromFile(info); ok {
+			value = contentFromFile
+		}
+
 		req := info.Tags.Get("required")
-		if !ok && def == "" {
+		if !ok && value == "" {
 			if isTrue(req) {
 				key := info.Key
 				if info.Alt != "" {
@@ -239,10 +243,6 @@ func Process(prefix string, spec interface{}) error {
 				return fmt.Errorf("required key %s missing value", key)
 			}
 			continue
-		}
-
-		if contentFromFile, ok := getContentFromFile(info); ok {
-			value = contentFromFile
 		}
 
 		err = processField(value, info.Field)
