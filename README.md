@@ -1,6 +1,6 @@
 # envconfig
 
-An extension of (http://godoc.org/github.com/kelseyhightower/envconfig)[http://godoc.org/github.com/kelseyhightower/envconfig]
+An extension of [http://godoc.org/github.com/kelseyhightower/envconfig](http://godoc.org/github.com/kelseyhightower/envconfig)
 
 ```Go
 import "github.com/tanqhnguyen/envconfig"
@@ -152,7 +152,7 @@ type Specification struct {
 Envconfig won't process a field with the "ignored" tag set to "true", even if a corresponding
 environment variable is set.
 
-The tag `file_content` can be used to read from a file, this is useful when we need to use (docker secret)[https://docs.docker.com/engine/swarm/secrets/]. By default, it appends `_FILE` to the env variable name to look for the file path. For example, with this struct, envconfig will look for `MYAPP_SECRET_FILE`, change `file_content` to something if needed (for instance, `file_content:"__FILE"`, this will look for `MYAPP_SECRET__FILE`). Content read from a file will have higher priority than value stored in `MYAPP_SECRET`. If the file is not found / unreadable for whatever reason, it will fail gracefully and fallback to `MYAPP_SECRET`.
+The tag `file_content` can be used to read from a file, this is useful when we need to use [docker secret](https://docs.docker.com/engine/swarm/secrets/). By default, it appends `_FILE` to the env variable name to look for the file path. For example, with this struct, envconfig will look for `MYAPP_SECRET_FILE`, change `file_content` to something if needed (for instance, `file_content:"__FILE"`, this will look for `MYAPP_SECRET__FILE`). Content read from a file will have higher priority than value stored in `MYAPP_SECRET`. If the file is not found / unreadable for whatever reason, it will fail gracefully and fallback to `MYAPP_SECRET`.
 
 ## Supported Struct Field Types
 
