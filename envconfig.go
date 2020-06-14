@@ -192,9 +192,16 @@ func getContentFromFile(info varInfo) (string, bool) {
 	}
 	fromFileKey := fmt.Sprintf("%s_%s", info.Key, strings.ToUpper(fromFile))
 	filePath, ok := lookupEnv(fromFileKey)
-	if !ok || filePath == "" {
+	if !ok {
+		fmt.Printf("%s is not found\n", fromFileKey)
 		return "", false
 	}
+
+	if filePath == "" {
+		fmt.Printf("%s is empty\n", fromFileKey)
+		return "", false
+	}
+
 	fileContent, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		fmt.Println("failed to load secret from file, err: ", err)
